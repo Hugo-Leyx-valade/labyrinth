@@ -48,8 +48,6 @@ public class LabyrinthCrawlerTest
     [Test]
     public void InitWithNoXThrowsArgumentException()
     {
-
-
         Assert.Throws<ArgumentException>(() => new Labyrinth.Labyrinth("""
                 +--+
                 |  |
@@ -64,14 +62,14 @@ public class LabyrinthCrawlerTest
     {
         var map = string.Join('\n', new[]
         {
-            "--+",
-            " x|",
+            "- +",
+            "|x|",
             "--+"
         });
         var laby = new Labyrinth.Labyrinth(map);
         var test = laby.NewCrawler();
 
-        test.Direction.TurnLeft();
+        test.Walk();
 
         Assert.That(test.FacingTile, Is.TypeOf<Outside>());
     }
@@ -81,14 +79,15 @@ public class LabyrinthCrawlerTest
     {
         var map = string.Join('\n', new[]
         {
-            "   ",
-            "x  ",
+            "---",
+            "x |",
             "---"
         });
         var laby = new Labyrinth.Labyrinth(map);
         var test = laby.NewCrawler();
 
         test.Direction.TurnLeft();
+
 
         Assert.That(test.FacingTile, Is.TypeOf<Outside>());
     }

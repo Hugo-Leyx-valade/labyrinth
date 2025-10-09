@@ -20,16 +20,13 @@ namespace Labyrinth
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
             }
-            try
-            {
-                this.spawn = _tiles.Cast<Tile>().OfType<Spawn>().LastOrDefault();
-                this.facingTile = _tiles[this.spawn.X, this.spawn.Y - 1];
-            }
-            catch (NullReferenceException ex)
-            {
-                throw new ArgumentException("Labyrinth must have exactly one spawn point 'x'", ex);
+            this.spawn = _tiles.Cast<Tile>().OfType<Spawn>().LastOrDefault();
 
+            if (this.spawn == null)
+            {
+                throw new ArgumentException("Labyrinth must have exactly one spawn point 'x'");
             }
+
         }
 
         /// <summary>
@@ -49,7 +46,6 @@ namespace Labyrinth
         /// 
 
         private Spawn spawn { get; set; }
-        private Tile facingTile { get; set; }
         public override string ToString()
         {
             var res = new StringBuilder();
@@ -72,7 +68,7 @@ namespace Labyrinth
             return res.ToString();
         }
         
-        public ICrawler NewCrawler() => new Crawler(spawn.X, spawn.Y,facingTile);
+        public ICrawler NewCrawler() => new Crawler(spawn.X, spawn.Y,_tiles);
         private readonly Tile[,] _tiles;
     }
 }
