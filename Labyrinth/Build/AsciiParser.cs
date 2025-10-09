@@ -26,6 +26,7 @@ namespace Labyrinth.Build
                         '+' or '-' or '|' => Wall.Singleton,
                         '/' => km.NewDoor(),
                         'k' => km.NewKeyRoom(),
+                        'x' => new Spawn(x,y),
                         _ => throw new ArgumentException($"Invalid map: unknown character '{lines[y][x]}' at line {y}, col {x}.")
                     };
                 }

@@ -1,5 +1,6 @@
 ﻿using Labyrinth.Crawl;
 using Labyrinth.Tiles;
+using System.Numerics;
 using System.Text;
 
 namespace Labyrinth
@@ -19,6 +20,11 @@ namespace Labyrinth
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
             }
+
+            Spawn? spawn = _tiles.Cast<Tile>()
+                     .OfType<Spawn>()
+                     .FirstOrDefault();
+
         }
 
         /// <summary>
@@ -35,6 +41,10 @@ namespace Labyrinth
         /// An ascii representation of the labyrinth.
         /// </summary>
         /// <returns>Formatted string</returns>
+        /// 
+
+        private Spawn spawn { get; set; }
+        private Tile facingTile { get; set; }
         public override string ToString()
         {
             var res = new StringBuilder();
@@ -45,6 +55,7 @@ namespace Labyrinth
                 {
                     res.Append(_tiles[x, y] switch
                     {
+                        Spawn => 'x',
                         Room => ' ',
                         Wall => '#',
                         Door => '/',
@@ -55,9 +66,8 @@ namespace Labyrinth
             }
             return res.ToString();
         }
-
-        public ICrawler NewCrawler() => throw new NotImplementedException("To be implemented");
-
+        
+        public ICrawler NewCrawler() => new Crawler(spawn.X, spawn.Y,facingTile);
         private readonly Tile[,] _tiles;
     }
 }
