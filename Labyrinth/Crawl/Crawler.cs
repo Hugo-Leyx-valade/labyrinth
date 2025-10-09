@@ -10,12 +10,12 @@ namespace Labyrinth.Crawl
 {
     internal class Crawler : ICrawler
     {
-        public Crawler(int X, int Y, Tile facingTile)
+        public Crawler(int X, int Y, Tile[,] tiles)
         {
             this.X = X;
             this.Y = Y;
             this.Direction = Direction.North;
-            this.FacingTile = facingTile;
+            this.tiles = tiles;
         }
 
         public int X { get; }
@@ -25,6 +25,8 @@ namespace Labyrinth.Crawl
         /// </summary>
         public int Y { get; }
 
+        public Tile[,] tiles { get; }
+
         /// <summary>
         /// Gets the current direction.
         /// </summary>
@@ -33,7 +35,12 @@ namespace Labyrinth.Crawl
         /// <summary>
         /// Gets the tile in front of the crawler.
         /// </summary>
-        public Tile FacingTile { get; }
+        public Tile FacingTile { 
+            get {
+                return tiles[X + this.Direction.DeltaX, Y + this.Direction.DeltaY];
+                
+            } 
+        }
 
         /// <summary>
         /// Pass the tile in front of the crawler and move into it.
