@@ -1,4 +1,5 @@
-﻿using Labyrinth.Tiles;
+﻿using Labyrinth.Build;
+using Labyrinth.Tiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace Labyrinth.Crawl
 {
     internal class RandomExplorer
     {
+
+        public static event EventHandler<CrawlingEventArgs>? ChangePosition;
+        public static event EventHandler<CrawlingEventArgs>? ChangeDirection;
 
         public ICrawler _crawler;
         public RandomExplorer(ICrawler crawler)
@@ -52,6 +56,7 @@ namespace Labyrinth.Crawl
                         this._crawler.Direction.TurnLeft();
                         break;
                 }
+            Thread.Sleep(100); // Petite pause pour visualiser les déplacements
             }
 
             Console.WriteLine("❌ Nombre maximal de déplacements atteint sans sortie.");
@@ -60,12 +65,12 @@ namespace Labyrinth.Crawl
 
         private void OnPositionChanged()
         {
-            Console.WriteLine($"📍 Position actuelle : ({this._crawler.X}, {this._crawler.Y})");
+            ChangePosition?.Invoke(this, new CrawlingEventArgs(this._crawler.X, this._crawler.Y, this._crawler.Direction));
         }
-
+    
         private void OnDirectionChanged()
         {
-            Console.WriteLine($"🧭 Direction actuelle : {this._crawler.Direction}");
+            ChangeDirection?.Invoke(this, new CrawlingEventArgs(this._crawler.X, this._crawler.Y, this._crawler.Direction));
         }
     }
 }
