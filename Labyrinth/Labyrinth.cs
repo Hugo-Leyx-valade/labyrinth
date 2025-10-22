@@ -1,4 +1,5 @@
-﻿using Labyrinth.Crawl;
+﻿using Labyrinth.Build;
+using Labyrinth.Crawl;
 using Labyrinth.Tiles;
 using System.Text;
 
@@ -14,7 +15,11 @@ namespace Labyrinth
         /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
         public Labyrinth(string ascii_map)
         {
-            _tiles = Build.AsciiParser.Parse(ascii_map, ref _start);
+            Build.AsciiParser.StartPositionFound += (_, e) =>
+            {
+                _start = (e.X, e.Y);
+            };
+            _tiles = Build.AsciiParser.Parse(ascii_map);
             if (_tiles.GetLength(0) < 3 || _tiles.GetLength(1) < 3)
             {
                 throw new ArgumentException("Labyrinth must be at least 3x3");
@@ -24,6 +29,8 @@ namespace Labyrinth
                 throw new ArgumentException("Labyrinth must have at least one starting position marked with x");
             }
         }
+
+        
 
         /// <summary>
         /// Labyrinth width (number of columns).
@@ -39,9 +46,17 @@ namespace Labyrinth
         /// An ascii representation of the labyrinth.
         /// </summary>
         /// <returns>Formatted string</returns>
+        /// 
+
+
+        
         public override string ToString()
         {
+
+
+            
             var res = new StringBuilder();
+            
 
             for (int y = 0; y < _tiles.GetLength(1); y++)
             {
@@ -67,7 +82,7 @@ namespace Labyrinth
         public ICrawler NewCrawler() =>
             new LabyrinthCrawler(_start.X, _start.Y, _tiles);
 
-        private (int X, int Y) _start = (-1, -1);
+        private static (int X, int Y) _start = (-1, -1);
 
         private readonly Tile[,] _tiles;
     }
