@@ -11,13 +11,13 @@ namespace Labyrinth
         public static void Main(string[] args)
         {
             var map = """
-                +-------- +
-                | x  |    |
-                |    +--+ |
-                |    |  | |
-                |    +--+ |
-                |         |
-                +---------+
+                +------ +
+                | x|    |
+                |+ +--+ |
+                |+ |  | |
+                |  +--+ |
+                |       |
+                +-------+
                 """;
 
             try
@@ -81,7 +81,7 @@ namespace Labyrinth
                 var explorer = new RandomExplorer(crawler);
                 Console.SetCursorPosition(0, lines.Length + 1);
                 Console.WriteLine("Début de l'exploration aléatoire...");
-                explorer.GetOut(100); // nombre maximal d'actions
+                explorer.GetOut(1000); // nombre maximal d'actions
 
                 Console.CursorVisible = true;
             }

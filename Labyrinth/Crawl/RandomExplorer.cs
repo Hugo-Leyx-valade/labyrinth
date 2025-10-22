@@ -30,7 +30,8 @@ namespace Labyrinth.Crawl
                 // Vérifie si la tuile actuelle est "Outside"
                 if (this._crawler.FacingTile is Outside)
                 {
-                    Console.WriteLine("🚪 Tu es sorti !");
+                    Console.Clear();
+                    Console.WriteLine("Tu es sorti !");
                     return true;
                 }
 
@@ -56,9 +57,9 @@ namespace Labyrinth.Crawl
                         this._crawler.Direction.TurnLeft();
                         break;
                 }
-            Thread.Sleep(100); // Petite pause pour visualiser les déplacements
+            Thread.Sleep(50); // Petite pause pour visualiser les déplacements
             }
-
+            Console.Clear();
             Console.WriteLine("❌ Nombre maximal de déplacements atteint sans sortie.");
             return false;
         }
