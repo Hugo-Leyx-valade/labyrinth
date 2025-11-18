@@ -100,4 +100,18 @@ public class KeymasterTest
             Throws.TypeOf<InvalidOperationException>()
             .With.Message.EqualTo("Unmatched key/door creation"));
     }
+
+    [Test]
+    public void DelayedKeyAndDoor_ShouldMatchCounts()
+    {
+        var keymaster = new Keymaster();
+
+        // 3 rooms avant portes
+        var r1 = keymaster.NewKeyRoom();
+        var d1 = keymaster.NewDoor();
+        var d2 = keymaster.NewDoor();
+        var r2 = keymaster.NewKeyRoom();
+
+        Assert.DoesNotThrow(() => keymaster.Dispose());
+    }
 }
