@@ -27,12 +27,7 @@ namespace Labyrinth.Build
         /// <exception cref="NotSupportedException">Multiple doors before key placement</exception>
         public Door NewDoor()
         {
-            if (unplacedKey.HasItems)
-            {
-                throw new NotSupportedException("Unable to handle multiple doors before key placement");
-            }
-            var door = new Door();
-
+            var door = new Door();   
             door.LockAndTakeKey(unplacedKey);
             PlaceKey();
             return door;
@@ -45,7 +40,6 @@ namespace Labyrinth.Build
         /// <exception cref="NotSupportedException">Multiple keyss before key placement</exception>
         public Room NewKeyRoom()
         {
-
             var room = new Room();
             emptyKeyRoom.Add(room);
             PlaceKey();
@@ -62,6 +56,6 @@ namespace Labyrinth.Build
         }
 
         private readonly MyInventory unplacedKey = new();
-        private List<Room> emptyKeyRoom = new();
+        private List<Room> emptyKeyRoom = new List<Room>();
     }
 }
