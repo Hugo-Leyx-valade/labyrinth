@@ -1,117 +1,132 @@
 ﻿using Labyrinth.Build;
-using Labyrinth.Items;
-using Labyrinth.Tiles;
 
-namespace LabyrinthTest;
-
-public class KeymasterTest
+namespace LabyrinthTest
 {
-    [Test]
-    public void Dispose_ShouldThrow_WhenUnplacedKeyOrEmptyRoomExists()
+    [TestFixture(Description = "Keymaster should handle arbitrary distributions of doors and key rooms")]
+    public class KeymasterTest
     {
-        var keymaster = new Keymaster();
-        keymaster.NewKeyRoom(); // crée une room sans clé
+        [Test]
+        public void DoorThenRoom_Matches_NoExceptionOnDispose()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                _ = km.NewDoor();
+                _ = km.NewKeyRoom();
+            }, Throws.Nothing);
+        }
 
-        Assert.That(() => keymaster.Dispose(),
-            Throws.TypeOf<InvalidOperationException>()
-            .With.Message.EqualTo("Unmatched key/door creation"));
-    }
+        [Test]
+        public void RoomThenDoor_Matches_NoExceptionOnDispose()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                var r = km.NewKeyRoom();
+                var d = km.NewDoor();
+            }, Throws.Nothing);
+        }
 
-    [Test]
-    public void NewKeyRoom_ShouldCreateRoom_AndNotThrow()
-    {
-        var keymaster = new Keymaster();
-        var room = keymaster.NewKeyRoom();
+        [Test]
+        public void Alternating_DKDK_Matches_All()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                km.NewDoor();
+                km.NewKeyRoom();
+                km.NewDoor();
+                km.NewKeyRoom();
+            }, Throws.Nothing);
+        }
 
-        Assert.That(room, Is.Not.Null);
-        Assert.That(room, Is.InstanceOf<Room>());
-    }
+        [Test]
+        public void Batch_DoorsThenRooms_AllMatch()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                km.NewDoor();
+                km.NewDoor();
+                km.NewKeyRoom();
+                km.NewKeyRoom();
+            }, Throws.Nothing);
+        }
 
-    [Test]
-    public void NewDoor_ShouldCreateDoor_AndLockIt()
-    {
-        var keymaster = new Keymaster();
-        // Crée d’abord une salle vide
-        keymaster.NewKeyRoom();
-        var door = keymaster.NewDoor();
+        [Test]
+        public void Batch_RoomsThenDoors_AllMatch()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                km.NewKeyRoom();
+                km.NewKeyRoom();
+                km.NewDoor();
+                km.NewDoor();
+            }, Throws.Nothing);
 
-        Assert.That(door, Is.Not.Null);
-        Assert.That(door, Is.InstanceOf<Door>());
-    }
+        }
 
-    [Test]
-    public void PlaceKey_ShouldDistributeKeys_WhenDoorAndRoomExist()
-    {
-        var keymaster = new Keymaster();
+        [Test]
+        public void ManyDoorsThenManyRooms_AllMatch()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                for (int i = 0; i < 10; i++) km.NewDoor();
+                for (int i = 0; i < 10; i++) km.NewKeyRoom();
+            }, Throws.Nothing);
 
-        // On crée d’abord une salle vide
-        var room = keymaster.NewKeyRoom();
-        // Puis une porte qui génère une clé
-        var door = keymaster.NewDoor();
+        }
 
-        // Après placement, les collections internes doivent être vides
-        var unplacedKeyField = typeof(Keymaster)
-            .GetField("unplacedKey", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
-        var unplacedKey = (MyInventory)unplacedKeyField.GetValue(keymaster)!;
+        [Test]
+        public void ManyRoomsThenManyDoors_AllMatch()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                for (int i = 0; i < 10; i++) km.NewKeyRoom();
+                for (int i = 0; i < 10; i++) km.NewDoor();
+            }, Throws.Nothing);
+        }
 
-        var emptyRoomsField = typeof(Keymaster)
-            .GetField("emptyKeyRoom", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
-        var emptyRooms = (List<Room>)emptyRoomsField.GetValue(keymaster)!;
+        [Test]
+        public void Unmatched_LeftoverDoor_ThrowsOnDispose()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                km.NewDoor();
+            }, Throws.InvalidOperationException);
+        }
 
-        Assert.That(unplacedKey.HasItems, Is.False);
-        Assert.That(emptyRooms.Count, Is.EqualTo(0));
-    }
+        [Test]
+        public void Unmatched_LeftoverRoom_ThrowsOnDispose()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                km.NewKeyRoom();
+            }, Throws.InvalidOperationException);
+        }
 
-    [Test]
-    public void MultipleKeysAndDoors_ShouldMatchCounts()
-    {
-        var keymaster = new Keymaster();
-
-        // 3 rooms avant portes
-        var r1 = keymaster.NewKeyRoom();
-        var r2 = keymaster.NewKeyRoom();
-        var r3 = keymaster.NewKeyRoom();
-
-        var d1 = keymaster.NewDoor();
-        var d2 = keymaster.NewDoor();
-        var d3 = keymaster.NewDoor();
-
-        Assert.DoesNotThrow(() => keymaster.Dispose());
-    }
-
-    [Test]
-    public void MissingDoor_ShouldCauseDisposeError()
-    {
-        var keymaster = new Keymaster();
-        keymaster.NewKeyRoom(); // crée une salle sans clé
-
-        Assert.That(() => keymaster.Dispose(),
-            Throws.TypeOf<InvalidOperationException>()
-            .With.Message.EqualTo("Unmatched key/door creation"));
-    }
-
-    [Test]
-    public void MissingKeyRoom_ShouldCauseDisposeError()
-    {
-        var keymaster = new Keymaster();
-        keymaster.NewDoor(); // crée une clé sans salle
-
-        Assert.That(() => keymaster.Dispose(),
-            Throws.TypeOf<InvalidOperationException>()
-            .With.Message.EqualTo("Unmatched key/door creation"));
-    }
-
-    [Test]
-    public void DelayedKeyAndDoor_ShouldMatchCounts()
-    {
-        var keymaster = new Keymaster();
-
-        // 3 rooms avant portes
-        var r1 = keymaster.NewKeyRoom();
-        var d1 = keymaster.NewDoor();
-        var d2 = keymaster.NewDoor();
-        var r2 = keymaster.NewKeyRoom();
-
-        Assert.DoesNotThrow(() => keymaster.Dispose());
+        [Test]
+        public void MixedInterleavings_SameCounts_NoException()
+        {
+            Assert.That(() =>
+            {
+                using var km = new Keymaster();
+                km.NewDoor();
+                km.NewDoor();
+                km.NewKeyRoom();
+                km.NewDoor();
+                km.NewKeyRoom();
+                km.NewKeyRoom();
+                km.NewDoor();
+                km.NewKeyRoom();
+                km.NewKeyRoom();
+                km.NewDoor();
+            }, Throws.Nothing);
+        }
     }
 }

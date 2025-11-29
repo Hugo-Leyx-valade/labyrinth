@@ -46,16 +46,22 @@ namespace Labyrinth.Items
             from._items.RemoveAt(nth);
         }
 
+        public void MoveAllItemsFrom(Inventory from)
+        {
+            (_items, from._items) = (from._items, _items);
+            if (from._items == null)
+            {
+                throw new InvalidOperationException("No item to take from the source inventory");
+            }
+            _items.InsertRange(0, from._items);
+            from._items.Clear();
+        }
+
         /// <summary>
         /// Swaps all items between inventories.
         /// </summary>
         /// <param name="from">The inventory to swap items with.</param>
-        public void SwapItems(Inventory from)
-        {
-            var tmp = _items;
-            _items = from._items;
-            from._items = tmp;
-        }
+
 
         /// <summary>
         /// Internal list of collectable items.

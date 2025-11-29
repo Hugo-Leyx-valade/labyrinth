@@ -1,4 +1,5 @@
 ﻿using Labyrinth.Items;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Labyrinth.Tiles
 {
@@ -35,10 +36,17 @@ namespace Labyrinth.Tiles
             {
                 throw new InvalidOperationException("Door is already unlocked.");
             }
-            LocalInventory.MoveItemFrom(keySource);
-            if (LocalInventory.Items.First() != _key)
+            LocalInventory.MoveAllItemsFrom(keySource);
+            while(LocalInventory.HasItems)
             {
-                keySource.MoveItemFrom(LocalInventory);
+                if (LocalInventory.Items.First() != _key)
+                {
+                    keySource.MoveItemFrom(LocalInventory);
+                }
+                else
+                {
+                    return IsOpened;
+                }
             }
             return IsOpened;
         }

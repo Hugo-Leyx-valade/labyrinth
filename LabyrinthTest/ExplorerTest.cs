@@ -249,11 +249,13 @@ public class ExplorerTest
             Actions.Walk
         );
         var left = test.GetOut(10);
-
+        
         Assert.That(left, Is.EqualTo(8));
         Assert.That(events.DirectionChangedCount, Is.EqualTo(0));
         Assert.That(events.PositionChangedCount, Is.EqualTo(2));
         Assert.That(events.LastArgs, Is.EqualTo((2, 0, Direction.North)));
+        Assert.That(test.visitedTiles.Count(t => t is Labyrinth.Tiles.Door), Is.EqualTo(1));
+        Assert.That(test.visitedTiles.Count(t => t is Labyrinth.Tiles.Room), Is.EqualTo(1));
     }
 
     [Test]
@@ -296,7 +298,9 @@ public class ExplorerTest
             out var events,
             Actions.Walk,// key
             Actions.Walk,
-            Actions.Walk,// swap keys
+            Actions.Walk,// ramasse une autre clé
+            Actions.Walk,
+            Actions.Walk,
             Actions.Walk // door
         );
         var left = test.GetOut(10);

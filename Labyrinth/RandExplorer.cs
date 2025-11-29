@@ -9,6 +9,8 @@ namespace Labyrinth
     {
         private readonly ICrawler _crawler = crawler;
         private readonly IEnumRandomizer<Actions> _rnd = rnd;
+
+        public List<Tile> visitedTiles = new ();
         
         public enum Actions
         {
@@ -28,7 +30,8 @@ namespace Labyrinth
                 if (_crawler.FacingTile.IsTraversable
                     && _rnd.Next() == Actions.Walk)
                 {
-                    _crawler.Walk().SwapItems(bag);
+                    visitedTiles.Add(_crawler.FacingTile);
+                    bag.MoveAllItemsFrom(_crawler.Walk());
                     changeEvent = PositionChanged;
                 }
                 else
@@ -37,9 +40,10 @@ namespace Labyrinth
                     changeEvent = DirectionChanged;
                 }
                 if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItems && bag.ItemTypes.First() == typeof(Key))
+                    && bag.HasItems &&  bag.ItemTypes.Contains(typeof(Key)))
                 {
-                    door.Open(bag);
+
+                 door.Open(bag);  
                 }
                 changeEvent?.Invoke(this, new CrawlingEventArgs(_crawler));
             }
